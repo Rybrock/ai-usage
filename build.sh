@@ -22,6 +22,7 @@ swiftc \
   Sources/UsageModels.swift \
   Sources/UsageService.swift \
   Sources/ClaudeGlyph.swift \
+  Sources/ClaudeApp.swift \
   Sources/UsageModel.swift \
   Sources/UsageView.swift \
   Sources/main.swift

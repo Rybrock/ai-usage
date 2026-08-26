@@ -24,7 +24,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let hosting = NSHostingController(
             rootView: UsageView(model: model,
                                 onQuit: { NSApp.terminate(nil) },
-                                onOpenSettings: { [weak self] in self?.showMenu() })
+                                onOpenSettings: { [weak self] in self?.showMenu() },
+                                onOpenClaude: { [weak self] in self?.openClaudeApp() })
         )
         hosting.sizingOptions = .preferredContentSize
 
@@ -130,6 +131,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         refresh.target = self
         menu.addItem(refresh)
 
+        let claudeItem = NSMenuItem(title: ClaudeApp.isInstalled ? "Open Claude" : "Open claude.ai",
+                                    action: #selector(openClaude), keyEquivalent: "o")
+        claudeItem.target = self
+        menu.addItem(claudeItem)
+
+        menu.addItem(.separator())
+
         let percent = NSMenuItem(title: "Show Percentage in Menu Bar",
                                  action: #selector(togglePercent), keyEquivalent: "")
         percent.target = self
@@ -152,6 +160,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
 
     @objc private func refreshNow() { model.refresh(force: true) }
+
+    @objc private func openClaude() { openClaudeApp() }
+
+    private func openClaudeApp() {
+        popover.performClose(nil)
+        ClaudeApp.open()
+    }
 
     @objc private func togglePercent() {
         let defaults = UserDefaults.standard

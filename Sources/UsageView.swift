@@ -112,6 +112,7 @@ struct UsageView: View {
     @ObservedObject var model: UsageModel
     var onQuit: () -> Void
     var onOpenSettings: () -> Void
+    var onOpenClaude: () -> Void
 
     private var sessionLimits: [LimitEntry] {
         model.snapshot?.limits.filter { $0.group == "session" } ?? []
@@ -217,6 +218,13 @@ struct UsageView: View {
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
             Spacer()
+            Button(ClaudeApp.isInstalled ? "Open Claude" : "claude.ai", action: onOpenClaude)
+                .buttonStyle(.plain)
+                .font(.system(size: 10))
+                .foregroundStyle(.tertiary)
+                .help(ClaudeApp.isInstalled
+                      ? "Open the Claude desktop app"
+                      : "Claude isn't installed — opens claude.ai")
             Button("Settings", action: onOpenSettings)
                 .buttonStyle(.plain)
                 .font(.system(size: 10))

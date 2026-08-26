@@ -25,8 +25,10 @@ No other dependencies — it's a single Swift binary against AppKit/SwiftUI.
 ## Usage
 
 - **Left click** the menu bar item to open the usage popover.
-- **Right click** for a menu: Refresh Now, Show Percentage in Menu Bar,
-  Launch at Login, Quit.
+- **Right click** for a menu: Refresh Now, Open Claude, Show Percentage in
+  Menu Bar, Launch at Login, Quit.
+- **Open Claude** (in the popover footer and the right-click menu) launches the
+  Claude desktop app, or opens claude.ai if it isn't installed.
 - The menu bar shows the Claude burst mark plus your current session
   percentage, turning orange at 75% and red at 90%.
 
