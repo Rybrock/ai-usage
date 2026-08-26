@@ -102,8 +102,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         guard let button = statusItem.button else { return }
 
         model.refreshIfStale()
-        NSApp.activate(ignoringOtherApps: true)
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+
+        // Make the popover key directly rather than via NSApp.activate:
+        // activating an accessory app pulls the system menu bar down over
+        // fullscreen windows and holds it there until you click back into the
+        // other app, which covers the top of whatever you were reading.
+        popover.contentViewController?.view.window?.makeKey()
 
         // .transient alone doesn't always dismiss for an accessory app.
         outsideClickMonitor = NSEvent.addGlobalMonitorForEvents(
