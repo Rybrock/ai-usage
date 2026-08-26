@@ -46,6 +46,40 @@ struct Spend: Decodable {
     /// Read `UsageSnapshot.credits` instead of branching on this directly.
     let enabled: Bool
     let disabledReason: String?
+    /// Markdown blurb with one inline link, e.g. "Usage credits cover you when
+    /// you hit your plan limits. [Learn more](https://…)".
+    let disclaimer: String?
+    let canPurchaseCredits: Bool?
+
+    /// The endpoint doesn't expose a credits *settings* URL, and the claude.ai
+    /// settings paths aren't stable enough to hardcode — so the one credits
+    /// destination we can trust is the link the API puts in `disclaimer`.
+    var disclaimerLink: SpendLink? {
+        guard let disclaimer,
+              let open = disclaimer.range(of: "]("),
+              let close = disclaimer.range(of: ")", range: open.upperBound..<disclaimer.endIndex),
+              let label = disclaimer.range(of: "[", options: .backwards,
+                                           range: disclaimer.startIndex..<open.lowerBound)
+        else { return nil }
+
+        // Only ever hand AppKit an https URL — this string comes off the wire.
+        guard let url = URL(string: String(disclaimer[open.upperBound..<close.lowerBound])),
+              url.scheme == "https"
+        else { return nil }
+
+        // An empty label would render as an invisible, unclickable link.
+        let text = disclaimer[label.upperBound..<open.lowerBound]
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return nil }
+
+        return SpendLink(label: text, url: url)
+    }
+}
+
+/// A markdown link lifted out of an API-provided blurb.
+struct SpendLink {
+    let label: String
+    let url: URL
 }
 
 /// The same credits figures in the endpoint's older shape. Modelled only for

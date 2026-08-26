@@ -167,9 +167,11 @@ struct UsageView: View {
                     case .on:
                         EmptyView()
                     case .capReached:
-                        creditsNote("Credits are on, but your monthly cap is used up.")
+                        creditsNote("Credits are on, but your monthly cap is used up.",
+                                    link: spend.disclaimerLink)
                     case .off:
-                        creditsNote("Usage credits are turned off.")
+                        creditsNote("Usage credits are turned off.",
+                                    link: spend.disclaimerLink)
                     }
                 }
 
@@ -180,10 +182,19 @@ struct UsageView: View {
         .frame(width: 340)
     }
 
-    private func creditsNote(_ text: String) -> some View {
-        Text(text)
+    /// One wrapping paragraph rather than an HStack, so the trailing link flows
+    /// with the sentence instead of being pushed off the 340pt popover.
+    private func creditsNote(_ text: String, link: SpendLink?) -> some View {
+        var note = AttributedString(text)
+        if let link {
+            var tail = AttributedString(" " + link.label)
+            tail.link = link.url
+            note += tail
+        }
+        return Text(note)
             .font(.system(size: 11))
             .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var header: some View {

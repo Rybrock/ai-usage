@@ -89,6 +89,10 @@ recover on its own.
   false once the monthly cap is used up even though credits are still on. The
   on/off state comes from `extra_usage.user_disabled` instead, so a used-up cap
   no longer reads as "credits are off".
+- Both credits notes end in a link parsed out of `spend.disclaimer`, which the
+  API returns as markdown. The claude.ai settings paths aren't documented or
+  stable, so the API's own link is the only credits destination worth trusting;
+  if the field ever stops parsing, the note just renders without a link.
 - `--open` is a debug flag that opens the popover on launch, useful for
   testing without clicking the menu bar.
 - The app is ad-hoc signed by `build.sh` so it keeps a stable identity across
