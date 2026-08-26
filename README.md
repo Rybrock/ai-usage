@@ -85,6 +85,10 @@ recover on its own.
 
 - The credits reset date isn't in the API response; credits roll over on the
   1st of the month, which is what the app displays.
+- `spend.enabled` is *effective* spendability, not the credits switch — it goes
+  false once the monthly cap is used up even though credits are still on. The
+  on/off state comes from `extra_usage.user_disabled` instead, so a used-up cap
+  no longer reads as "credits are off".
 - `--open` is a debug flag that opens the popover on launch, useful for
   testing without clicking the menu bar.
 - The app is ad-hoc signed by `build.sh` so it keeps a stable identity across

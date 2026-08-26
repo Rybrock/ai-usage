@@ -163,12 +163,13 @@ struct UsageView: View {
                              subtitle: Format.creditsReset(),
                              percent: spend.percent,
                              color: severityColor(spend.severity, percent: spend.percent))
-                    if !spend.enabled {
-                        Text(spend.disabledReason == "out_of_credits"
-                             ? "Credits are off — you've used your monthly cap."
-                             : "Usage credits are turned off.")
-                            .font(.system(size: 11))
-                            .foregroundStyle(.secondary)
+                    switch snapshot.credits {
+                    case .on:
+                        EmptyView()
+                    case .capReached:
+                        creditsNote("Credits are on, but your monthly cap is used up.")
+                    case .off:
+                        creditsNote("Usage credits are turned off.")
                     }
                 }
 
@@ -177,6 +178,12 @@ struct UsageView: View {
         }
         .padding(14)
         .frame(width: 340)
+    }
+
+    private func creditsNote(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 11))
+            .foregroundStyle(.secondary)
     }
 
     private var header: some View {

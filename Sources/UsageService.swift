@@ -139,6 +139,7 @@ enum UsageService {
 
         return UsageSnapshot(limits: usage.limits,
                              spend: usage.spend,
+                             extraUsage: usage.extraUsage,
                              plan: cachedPlan ?? "",
                              fetchedAt: Date())
     }

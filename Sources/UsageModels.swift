@@ -6,6 +6,7 @@ import Foundation
 struct UsageResponse: Decodable {
     let limits: [LimitEntry]
     let spend: Spend?
+    let extraUsage: ExtraUsage?
 }
 
 struct LimitEntry: Decodable, Identifiable {
@@ -40,8 +41,29 @@ struct Spend: Decodable {
     let limit: Money?
     let percent: Double
     let severity: String
+    /// Effective spendability, *not* the user's setting — this goes false when
+    /// the monthly cap is reached even though credits are still switched on.
+    /// Read `UsageSnapshot.credits` instead of branching on this directly.
     let enabled: Bool
     let disabledReason: String?
+}
+
+/// The same credits figures in the endpoint's older shape. Modelled only for
+/// `user_disabled`, which is the actual on/off toggle from the Claude settings
+/// pane and has no equivalent in `spend`.
+struct ExtraUsage: Decodable {
+    let userDisabled: Bool?
+    let spendLimitReached: Bool?
+}
+
+/// What the popover should say about usage credits.
+enum CreditsState {
+    /// On and spendable — no explanatory line needed.
+    case on
+    /// Still switched on, but the monthly cap is used up.
+    case capReached
+    /// The user has switched credits off.
+    case off
 }
 
 struct Money: Decodable {
@@ -86,8 +108,21 @@ struct ProfileResponse: Decodable {
 struct UsageSnapshot {
     var limits: [LimitEntry]
     var spend: Spend?
+    var extraUsage: ExtraUsage?
     var plan: String
     var fetchedAt: Date
+
+    /// Hitting the monthly cap clears `spend.enabled` while the toggle stays
+    /// on, so "off" has to come from `user_disabled` to match what the Claude
+    /// settings pane shows.
+    var credits: CreditsState {
+        if extraUsage?.userDisabled == true { return .off }
+        if spend?.enabled == true { return .on }
+        if spend?.disabledReason == "out_of_credits" || extraUsage?.spendLimitReached == true {
+            return .capReached
+        }
+        return .off
+    }
 
     var sessionPercent: Double? {
         limits.first(where: { $0.kind == "session" })?.percent
